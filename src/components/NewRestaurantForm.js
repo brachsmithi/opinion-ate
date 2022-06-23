@@ -11,11 +11,7 @@ export function NewRestaurantForm({createRestaurant}) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!name) {
-      setValidationError(true);
-    } else {
-      setValidationError(false);
-    }
+    setValidationError(!name);
     await createRestaurant(name);
     setName('');
   }
