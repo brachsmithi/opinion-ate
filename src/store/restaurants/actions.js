@@ -2,6 +2,10 @@ export const START_LOADING = 'START_LOADING';
 export const STORE_RESTAURANTS = 'STORE_RESTAURANTS';
 export const RECORD_LOADING_ERROR = 'RECORD_LOADING_ERROR';
 
+export const createRestaurant = name => async (dispatch, getState, api) => {
+  await api.createRestaurant(name);
+};
+
 export const loadRestaurants = () => async (dispatch, getState, api) => {
   try {
     dispatch(startLoading());
