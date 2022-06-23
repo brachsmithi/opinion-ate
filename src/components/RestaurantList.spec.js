@@ -8,15 +8,16 @@ describe('RestaurantList', () => {
   ];
   let loadRestaurants;
 
-  function renderComponent() {
-    loadRestaurants = jest.fn().mockName('loadRestaurants');
+  function renderComponent(propOverrides = {}) {
+    const props = {
+      loadRestaurants: jest.fn().mockName('loadRestaurants'),
+      loading: false,
+      restaurants,
+      ...propOverrides,
+    };
 
-    render(
-      <RestaurantList
-        loadRestaurants={loadRestaurants}
-        restaurants={restaurants}
-      />,
-    );
+    loadRestaurants = props.loadRestaurants;
+    render(<RestaurantList {...props} />);
   }
 
   it('loads restaurants on first render', () => {
@@ -24,9 +25,37 @@ describe('RestaurantList', () => {
     expect(loadRestaurants).toHaveBeenCalled();
   });
 
-  it('displays the restaurants', () => {
-    renderComponent();
-    expect(screen.getByText('Sushi Place')).toBeInTheDocument();
-    expect(screen.getByText('Pizza Place')).toBeInTheDocument();
+  describe('when loading succeeds', () => {
+    it('displays the loading indicator while loading', () => {
+      renderComponent({loading: true});
+      expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    });
+
+    it('does not display the loading indicator while not loading', () => {
+      renderComponent();
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+
+    it('does not display the error messsage', () => {
+      renderComponent();
+      expect(
+        screen.queryByText('Restaurants could not be loaded.'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('displays the restaurants', () => {
+      renderComponent();
+      expect(screen.getByText('Sushi Place')).toBeInTheDocument();
+      expect(screen.getByText('Pizza Place')).toBeInTheDocument();
+    });
+  });
+
+  describe('when loading fails', () => {
+    it('displays th error message', () => {
+      renderComponent({loadError: true});
+      expect(
+        screen.getByText('Restaurants could not be loaded.'),
+      ).toBeInTheDocument();
+    });
   });
 });
