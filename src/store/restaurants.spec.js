@@ -5,14 +5,20 @@ import {loadRestaurants} from './restaurants/actions';
 
 describe('restaurants', () => {
   describe('initially', () => {
-    it('does not have the loading flag set', () => {
+    let store;
+    beforeEach(() => {
       const initialState = {};
-      const store = createStore(
+      store = createStore(
         restaurantsReducer,
         initialState,
         applyMiddleware(thunk),
       );
+    });
+    it('does not have the loading flag set', () => {
       expect(store.getState().loading).toEqual(false);
+    });
+    it('does not have the error flag set', () => {
+      expect(store.getState().loadError).toEqual(false);
     });
   });
   describe('loadRestaurants action', () => {
