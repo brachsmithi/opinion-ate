@@ -40,6 +40,11 @@ describe('NewRestaurantForm', () => {
       return act(flushPromises);
     }
 
+    it('does not display a server error', async () => {
+      await renderComponent();
+      expect(screen.queryByText(serverError)).not.toBeInTheDocument();
+    });
+
     it('does not display a validation error', async () => {
       await fillInForm();
       expect(screen.queryByText(requiredError)).not.toBeInTheDocument();
@@ -113,6 +118,35 @@ describe('NewRestaurantForm', () => {
     it('displays a server error', async () => {
       await fillInForm();
       expect(screen.getByText(serverError)).toBeInTheDocument();
+    });
+
+    it('does not clear the name', async () => {
+      await fillInForm();
+      expect(screen.getByPlaceholderText('Add Restaurant').value).toEqual(
+        restaurantName,
+      );
+    });
+  });
+
+  describe('when retrying after a server error', () => {
+    async function retrySubmittingForm() {
+      renderComponent();
+      createRestaurant.mockRejectedValueOnce().mockResolvedValueOnce();
+
+      await userEvent.type(
+        screen.getByPlaceholderText('Add Restaurant'),
+        restaurantName,
+      );
+      userEvent.click(screen.getByText('Add'));
+      await act(flushPromises);
+
+      userEvent.click(screen.getByText('Add'));
+      return act(flushPromises);
+    }
+
+    it.skip('clears the server error', async () => {
+      await retrySubmittingForm();
+      expect(screen.queryByText(serverError)).not.toBeInTheDocument();
     });
   });
 });
